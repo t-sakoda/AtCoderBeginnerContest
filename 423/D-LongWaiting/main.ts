@@ -15,22 +15,18 @@ export function Main(input: string[]) {
   // N: 団体客の人数（rowの数）, K: 最大K人まで客を入れられる
   const [N, K] = input[0].split(" ").map(Number);
   const rows = input.slice(1, N + 1).map(row => row.split(" ").map(Number));
-  const customers: Customer[] = []
-
-  for (let i = 0; i < N; i++) {
-    customers.push({
-      // 待ち行事列の末尾に加わる時刻
-      arrive: rows[i][0],
-      // 入店してから退店するまでの時間
-      stay: rows[i][1],
-      // 団体客の人数
-      num: rows[i][2],
-      // 入店時刻
-      enter: undefined,
-      // 退店時刻
-      leave: undefined,
-    })
-  }
+  const customers: Customer[] = rows.sort(r => r[0]).map(r => ({
+    // 待ち行事列の末尾に加わる時刻
+    arrive: r[0],
+    // 入店してから退店するまでの時間
+    stay: r[1],
+    // 団体客の人数
+    num: r[2],
+    // 入店時刻
+    enter: undefined,
+    // 退店時刻
+    leave: undefined,
+  }))
 
   // 現在の店内の人数
   let currentNum = 0;
