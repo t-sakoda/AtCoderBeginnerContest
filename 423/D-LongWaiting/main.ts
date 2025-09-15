@@ -11,6 +11,64 @@ interface Customer {
   leave: number | undefined;
 }
 
+// 最小ヒープ（汎用）
+export class MinHeap<T> {
+  private a: T[] = [];
+  constructor(private cmp: (x: T, y: T) => number) { }
+
+  size(): number { return this.a.length; }
+  isEmpty(): boolean { return this.a.length === 0; }
+  peek(): T | undefined { return this.a[0]; }
+
+  push(v: T): void {
+    const a = this.a;
+    a.push(v);
+    this.siftUp(a.length - 1);
+  }
+
+  pop(): T | undefined {
+    const a = this.a;
+    if (a.length === 0) return undefined;
+    const top = a[0];
+    const last = a.pop()!;
+    if (a.length) {
+      a[0] = last;
+      this.siftDown(0);
+    }
+    return top;
+  }
+
+  private siftUp(i: number): void {
+    const a = this.a, cmp = this.cmp;
+    while (i > 0) {
+      const p = (i - 1) >> 1;
+      if (cmp(a[i], a[p]) >= 0) break;
+      [a[i], a[p]] = [a[p], a[i]];
+      i = p;
+    }
+  }
+
+  private siftDown(i: number): void {
+    const a = this.a, cmp = this.cmp;
+    const n = a.length;
+    while (true) {
+      let l = (i << 1) + 1;
+      if (l >= n) break;
+      let r = l + 1;
+      let m = l;
+      if (r < n && cmp(a[r], a[l]) < 0) m = r;
+      if (cmp(a[m], a[i]) >= 0) break;
+      [a[i], a[m]] = [a[m], a[i]];
+      i = m;
+    }
+  }
+}
+
+interface LeaveEvent {
+  leaveTime: number;
+  customerIndex: number;
+}
+
 export function Main(input: string[]) {
   // N: 団体客の人数（rowの数）, K: 最大K人まで客を入れられる
   const [N, K] = input[0].split(" ").map(Number);
@@ -39,22 +97,18 @@ export function Main(input: string[]) {
   let enteredCount = 0;
   // 現在時刻
   let time = 0;
-  // 店内にいるお客様
-  let inShopCustomers: Customer[] = [];
+  const heap = new MinHeap<LeaveEvent>((x, y) => x.leaveTime - y.leaveTime || x.customerIndex - y.customerIndex);
 
   while (enteredCount < N) {
-    inShopCustomers = [];
 
     // 退店処理
-    for (let i = 0; i < enteredCount; i++) {
-      const customer = customers[i];
-      if (!customer) continue;
-      // 現在時刻で入店済 かつ 退店時刻になった団体客を抽出
-      if (customer.enter !== undefined && customer.leave === undefined && time >= customer.enter + customer.stay) {
-        customer.leave = time; // 退店
+    while (!heap.isEmpty() && heap.peek()!.leaveTime <= time) {
+      const leaveEvent = heap.pop()!;
+      const customer = customers[leaveEvent.customerIndex];
+      if (customer) {
+        customer.leave = leaveEvent.leaveTime;
         currentNum -= customer.num;
       }
-      inShopCustomers.push(customer);
     }
 
     // 入店処理
@@ -71,8 +125,7 @@ export function Main(input: string[]) {
       currentNum += customer.num;
       customer.enter = time;
       enteredCount++;
-
-      inShopCustomers.push(customer);
+      heap.push({ leaveTime: time + customer.stay, customerIndex: nextWaitingCustomerIndex });
     }
 
     // 全てのお客様が入店したら終了
@@ -86,15 +139,7 @@ export function Main(input: string[]) {
     const nextArrive = time < nextCustomer.arrive ? nextCustomer.arrive : Infinity;
 
     // 次に退店予定の団体客の退店時刻
-    let nextLeave = Infinity;
-    inShopCustomers.forEach(c => {
-      if (c.leave === undefined && c.enter !== undefined) {
-        const leaveTime = c.enter + c.stay;
-        if (leaveTime > time && leaveTime < nextLeave) {
-          nextLeave = leaveTime;
-        }
-      }
-    });
+    const nextLeave = heap.peek()?.leaveTime ?? Infinity;
 
     // 次のイベント発生時刻
     time = Math.min(nextArrive, nextLeave);
