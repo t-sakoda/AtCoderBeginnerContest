@@ -93,7 +93,8 @@ export function Main(input: string[]) {
   let enteredCount = 0;
   // 現在時刻
   let time = 0;
-  const heap = new MinHeap<LeaveEvent>((x, y) => x.leaveTime - y.leaveTime || x.customerIndex - y.customerIndex);
+  // 退店予定の団体客を管理する最小ヒープ。退店予定時刻が同じなら、先に入店した団体客が先に退店する。
+  const heap = new MinHeap<LeaveEvent>((x, y) => x.leaveTime - y.leaveTime);
 
   while (enteredCount < N) {
 
