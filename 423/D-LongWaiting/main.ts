@@ -15,7 +15,8 @@ export function Main(input: string[]) {
   // N: 団体客の人数（rowの数）, K: 最大K人まで客を入れられる
   const [N, K] = input[0].split(" ").map(Number);
   const rows = input.slice(1, N + 1).map(row => row.split(" ").map(Number));
-  const customers: Customer[] = rows.sort(r => r[0]).map(r => ({
+  // rows は row[0]: 待ち行事列の末尾に加わる時刻 でソートされているものとする
+  const customers: Customer[] = rows.map(r => ({
     // 待ち行事列の末尾に加わる時刻
     arrive: r[0],
     // 入店してから退店するまでの時間
