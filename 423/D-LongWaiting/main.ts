@@ -28,14 +28,22 @@ export function Main(input: string[]) {
     leave: undefined,
   }))
 
+  /**
+   * それぞれの団体客が入店する時刻を求める。
+   */
+
   // 現在の店内の人数
   let currentNum = 0;
   // 待ち行列の先頭のお客様のインデックス
   let enteredCount = 0;
-
-  // それぞれの団体客が入店する時刻を求める。
+  // 現在時刻
   let time = 0;
-  while (true) {
+  // 店内にいるお客様
+  let inShopCustomers: Customer[] = [];
+
+  while (enteredCount < N) {
+    inShopCustomers = [];
+
     // 退店処理
     for (let i = 0; i < enteredCount; i++) {
       const customer = customers[i];
@@ -45,6 +53,7 @@ export function Main(input: string[]) {
         customer.leave = time; // 退店
         currentNum -= customer.num;
       }
+      inShopCustomers.push(customer);
     }
 
     // 入店処理
@@ -61,6 +70,8 @@ export function Main(input: string[]) {
       currentNum += customer.num;
       customer.enter = time;
       enteredCount++;
+
+      inShopCustomers.push(customer);
     }
 
     // 全てのお客様が入店したら終了
@@ -69,21 +80,23 @@ export function Main(input: string[]) {
     // 時刻を1ずつ進めるとタイムアウトしてしまうので、次のイベント発生時刻まで一気に進める
     // 次のイベントとは？ => 「次に入店する団体客の来店時刻」または「次に退店する団体客の退店時刻」
     // 次に入店予定の団体客の来店時刻
-    const nextArrive = customers.reduce((acc, cur) => {
-      if (cur.enter !== undefined) return acc;
-      if (cur.arrive <= time) return acc;
-      return Math.min(acc, cur.arrive);
-    }, Infinity);
+    const nextArrive = customers.find(c => c.arrive > time)?.arrive || Infinity;
 
     // 次に退店予定の団体客の退店時刻
-    const nextLeave = customers.reduce((acc, cur) => {
-      if (cur.leave !== undefined) return acc;
-      if (cur.enter === undefined) return acc;
-      return Math.min(acc, (cur.enter ?? 0) + cur.stay);
-    }, Infinity);
+    let nextLeave = Infinity;
+    inShopCustomers.forEach(c => {
+      if (c.leave === undefined && c.enter !== undefined) {
+        const leaveTime = c.enter + c.stay;
+        if (leaveTime > time && leaveTime < nextLeave) {
+          nextLeave = leaveTime;
+        }
+      }
+    });
 
     // 次のイベント発生時刻
     time = Math.min(nextArrive, nextLeave);
+    // 次の退店予定時刻をリセット
+    nextLeave = Infinity;
   }
 
   const result = customers.map(c => c.enter);
