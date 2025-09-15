@@ -35,7 +35,7 @@ export function Main(input: string[]) {
 
   // 現在の店内の人数
   let currentNum = 0;
-  // 待ち行列の先頭のお客様のインデックス
+  // 入店済の団体客数
   let enteredCount = 0;
   // 現在時刻
   let time = 0;
