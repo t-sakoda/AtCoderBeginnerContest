@@ -97,14 +97,11 @@ export function Main(input: string[]) {
   const heap = new MinHeap<LeaveEvent>((x, y) => x.leaveTime - y.leaveTime);
 
   while (enteredCount < N) {
-
     // 退店処理
     while (!heap.isEmpty() && heap.peek()!.leaveTime <= time) {
       const leaveEvent = heap.pop()!;
       const customer = customers[leaveEvent.customerIndex];
-      if (customer) {
-        currentNum -= customer.num;
-      }
+      currentNum -= customer.num;
     }
 
     // 入店処理
@@ -112,7 +109,6 @@ export function Main(input: string[]) {
       // 次にお待ちのお客様のインデックスは、入店済の団体客数と一致する
       const nextWaitingCustomerIndex = enteredCount
       const customer = customers[nextWaitingCustomerIndex];
-      if (!customer) break;
       // お客様はご来店か？
       if (time < customer.arrive) break;
       // 席に空きがなければスキップ
