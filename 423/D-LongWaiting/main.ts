@@ -75,7 +75,24 @@ export function Main(input: string[]) {
     // 全ての団体客が入店していたら終了
     if (customers.every(c => c.enter !== undefined)) break;
 
-    time++;
+    // 時刻を1ずつ進めるとタイムアウトしてしまうので、次のイベント発生時刻まで一気に進める
+    // 次のイベントとは？ => 「次に入店する団体客の来店時刻」または「次に退店する団体客の退店時刻」
+    // 次に入店予定の団体客の来店時刻
+    const nextArrive = customers.reduce((acc, cur) => {
+      if (cur.enter !== undefined) return acc;
+      if (cur.arrive <= time) return acc;
+      return Math.min(acc, cur.arrive);
+    }, Infinity);
+
+    // 次に退店予定の団体客の退店時刻
+    const nextLeave = customers.reduce((acc, cur) => {
+      if (cur.leave !== undefined) return acc;
+      if (cur.enter === undefined) return acc;
+      return Math.min(acc, (cur.enter ?? 0) + cur.stay);
+    }, Infinity);
+
+    // 次のイベント発生時刻
+    time = Math.min(nextArrive, nextLeave);
   }
 
   const result = customers.map(c => c.enter);
