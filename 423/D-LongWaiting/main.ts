@@ -51,20 +51,6 @@ export function Main(input: string[]) {
       }
     }
 
-    for (let i = 0; i < N; i++) {
-      const customer = customers[i];
-      if (!customer) continue;
-      // 入店していなかったらスキップ
-      if (!customer.enter) continue;
-      // 退店していたらスキップ
-      if (customer.leave) continue;
-      // まだお楽しみ中（現在時刻 < 入店時間 + 滞在時間）ならスキップ
-      if (time < customer.enter + customer.stay) continue;
-      // お客様のお帰りです
-      customer.leave = time;
-      currentNum -= customer.num;
-    }
-
     // 入店処理
     while (waitingCustomerIndex < N) {
       const customer = customers[waitingCustomerIndex];
