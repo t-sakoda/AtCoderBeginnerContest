@@ -139,7 +139,7 @@ export function Main(input: string[]) {
     if (time === Infinity) break; // これ以上進めない場合は終了
   }
 
-  const result = customers.map(c => c.enter);
+  const result = customers.map(c => String(c.enter!));
   return result.join("\n");
 }
 
