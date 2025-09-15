@@ -98,6 +98,7 @@ export function Main(input: string[]) {
 
     // 次のイベント発生時刻
     time = Math.min(nextArrive, nextLeave);
+    if (time === Infinity) break; // これ以上進めない場合は終了
   }
 
   const result = customers.map(c => c.enter);
