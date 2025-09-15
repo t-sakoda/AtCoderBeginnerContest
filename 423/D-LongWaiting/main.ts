@@ -81,7 +81,9 @@ export function Main(input: string[]) {
     // 時刻を1ずつ進めるとタイムアウトしてしまうので、次のイベント発生時刻まで一気に進める
     // 次のイベントとは？ => 「次に入店する団体客の来店時刻」または「次に退店する団体客の退店時刻」
     // 次に入店予定の団体客の来店時刻
-    const nextArrive = customers.find(c => c.arrive > time)?.arrive || Infinity;
+    const nextCustomer = customers[enteredCount];
+    // 既に来店している場合はInfinityにして、次に退店する団体客の退店時刻を優先させる
+    const nextArrive = time < nextCustomer.arrive ? nextCustomer.arrive : Infinity;
 
     // 次に退店予定の団体客の退店時刻
     let nextLeave = Infinity;
