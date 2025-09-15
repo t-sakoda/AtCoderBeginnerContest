@@ -31,13 +31,13 @@ export function Main(input: string[]) {
   // 現在の店内の人数
   let currentNum = 0;
   // 待ち行列の先頭のお客様のインデックス
-  let waitingCustomerIndex = 0;
+  let enteredCount = 0;
 
   // それぞれの団体客が入店する時刻を求める。
   let time = 0;
   while (true) {
     // 退店処理
-    for (let i = 0; i < waitingCustomerIndex; i++) {
+    for (let i = 0; i < enteredCount; i++) {
       const customer = customers[i];
       if (!customer) continue;
       // 現在時刻で入店済 かつ 退店時刻になった団体客を抽出
@@ -48,8 +48,10 @@ export function Main(input: string[]) {
     }
 
     // 入店処理
-    while (waitingCustomerIndex < N) {
-      const customer = customers[waitingCustomerIndex];
+    while (enteredCount < N) {
+      // 次にお待ちのお客様のインデックスは、入店済の団体客数と一致する
+      const nextWaitingCustomerIndex = enteredCount
+      const customer = customers[nextWaitingCustomerIndex];
       if (!customer) break;
       // お客様はご来店か？
       if (time < customer.arrive) break;
@@ -58,11 +60,11 @@ export function Main(input: string[]) {
       // いらっしゃいませ
       currentNum += customer.num;
       customer.enter = time;
-      waitingCustomerIndex++;
+      enteredCount++;
     }
 
     // 全てのお客様が入店したら終了
-    if (waitingCustomerIndex === N) break;
+    if (enteredCount === N) break;
 
     // 時刻を1ずつ進めるとタイムアウトしてしまうので、次のイベント発生時刻まで一気に進める
     // 次のイベントとは？ => 「次に入店する団体客の来店時刻」または「次に退店する団体客の退店時刻」
