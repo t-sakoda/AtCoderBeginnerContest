@@ -50,9 +50,9 @@ class MinHeap<T> {
     const a = this.a, cmp = this.cmp;
     const n = a.length;
     while (true) {
-      let l = (i << 1) + 1;
+      const l = (i << 1) + 1;
       if (l >= n) break;
-      let r = l + 1;
+      const r = l + 1;
       let m = l;
       if (r < n && cmp(a[r], a[l]) < 0) m = r;
       if (cmp(a[m], a[i]) >= 0) break;
