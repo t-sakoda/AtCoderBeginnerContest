@@ -7,8 +7,6 @@ interface Customer {
   num: number;
   // 入店時刻
   enter: number | undefined;
-  // 退店時刻
-  leave: number | undefined;
 }
 
 // 最小ヒープ（汎用）
@@ -83,8 +81,6 @@ export function Main(input: string[]) {
     num: r[2],
     // 入店時刻
     enter: undefined,
-    // 退店時刻
-    leave: undefined,
   }))
 
   /**
@@ -106,7 +102,6 @@ export function Main(input: string[]) {
       const leaveEvent = heap.pop()!;
       const customer = customers[leaveEvent.customerIndex];
       if (customer) {
-        customer.leave = leaveEvent.leaveTime;
         currentNum -= customer.num;
       }
     }
@@ -131,8 +126,6 @@ export function Main(input: string[]) {
     // 全てのお客様が入店したら終了
     if (enteredCount === N) break;
 
-    // 時刻を1ずつ進めるとタイムアウトしてしまうので、次のイベント発生時刻まで一気に進める
-    // 次のイベントとは？ => 「次に入店する団体客の来店時刻」または「次に退店する団体客の退店時刻」
     // 次に入店予定の団体客の来店時刻
     const nextCustomer = customers[enteredCount];
     // 既に来店している場合はInfinityにして、次に退店する団体客の退店時刻を優先させる
