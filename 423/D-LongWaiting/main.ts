@@ -10,7 +10,7 @@ interface Customer {
 }
 
 // 最小ヒープ（汎用）
-export class MinHeap<T> {
+class MinHeap<T> {
   private a: T[] = [];
   constructor(private cmp: (x: T, y: T) => number) { }
 
