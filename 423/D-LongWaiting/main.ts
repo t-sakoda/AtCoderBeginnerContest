@@ -95,8 +95,6 @@ export function Main(input: string[]) {
 
     // 次のイベント発生時刻
     time = Math.min(nextArrive, nextLeave);
-    // 次の退店予定時刻をリセット
-    nextLeave = Infinity;
   }
 
   const result = customers.map(c => c.enter);
